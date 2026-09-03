@@ -1,0 +1,50 @@
+name: cybernews
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: local/cybernews-aggregator:1.0.0
+    container_name: cybernews-app
+    restart: unless-stopped
+    init: true
+    read_only: true
+    stop_grace_period: 15s
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    pids_limit: 128
+    mem_limit: 384m
+    cpus: "1.0"
+    ulimits:
+      nofile:
+        soft: 512
+        hard: 1024
+    ports:
+      - "${BIND_IP:-127.0.0.1}:${BIND_PORT:-8000}:8000"
+    environment:
+      HOST: 0.0.0.0
+      PORT: "8000"
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONUNBUFFERED: "1"
+      DB_PATH: /data/cybernews_data.db
+      BG_REFRESH: "${BG_REFRESH:-300}"
+      TRUST_PROXY: "${TRUST_PROXY:-0}"
+      FEED_PROXY: "${FEED_PROXY:-}"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - cybernews-data:/data
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=16m,mode=1777
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "3"
+
+volumes:
+  cybernews-data:
+    name: cybernews-data
