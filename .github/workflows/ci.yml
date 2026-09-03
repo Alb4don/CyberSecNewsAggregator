@@ -31,9 +31,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt ruff bandit pip-audit
       - name: Ruff
-        run: ruff check app.py
+        run: ruff check cybersecnews.py
       - name: Bandit
-        run: bandit --quiet -ll app.py
+        run: bandit --quiet -ll cybersecnews.py
       - name: Dependency audit
         run: pip-audit --progress-spinner off
 
